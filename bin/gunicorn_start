@@ -1,0 +1,26 @@
+#!/bin/bash
+
+NAME='jason_blog'
+DJANGODIR=/home/jason/git/new_blog/blog_site
+SOCKFILE=/home/jason/git/new_blog/run/gunicorn.sock
+USER=jason
+NUM_WORKERS=3
+DJANGO_SETTINGS_MODULE=blog_site.settings
+DJANGO_WSGI_MODULE=blog_site.wsgi
+
+echo "Starting"
+
+cd $DJANGODIR
+source /home/jason/git/venv/bin/activate
+export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
+export PYTHONPATH=$DJANGODIR:$PYTHONPATH
+
+RUNDIR=$(dirname $SOCKFILE)
+test -d $RUNDIR || mkdir -p $RUNDIR
+
+exec gunicorn ${DJANGO_WSGI_MODULE}:application \
+--name $NAME \
+--workers $NUM_WORKERS \
+--bind=127.0.0.1:8000 \
+--log-level=debug 
+
